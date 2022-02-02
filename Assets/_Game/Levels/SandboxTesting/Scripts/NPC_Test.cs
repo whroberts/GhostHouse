@@ -2,7 +2,25 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NPC_Test : NPCBase
+namespace NPC
 {
-    
+    public class NPC_Test : NPCBase
+    {
+        public override void Idle()
+        {
+
+        }
+        public override void Talking()
+        {
+
+        }
+        public override void Reactions()
+        {
+
+        }
+        public override void Dialogue()
+        {
+
+        }
+    }
 }
