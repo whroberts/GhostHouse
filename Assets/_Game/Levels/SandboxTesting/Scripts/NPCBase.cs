@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace NPC {
+
+    [RequireComponent(typeof(Rigidbody))]
+    [RequireComponent(typeof(Collider))]
+    [RequireComponent(typeof(AudioSource))]
+    [RequireComponent(typeof(Animator))]
     public abstract class NPCBase : MonoBehaviour, IInteractable
     {
         [Header("NPC Details")]
@@ -15,10 +20,6 @@ namespace NPC {
         [SerializeField] protected AnimationClip _idleAnimation = null;
         [SerializeField] protected AnimationClip _surprisedAnimation = null;
         [SerializeField] protected AnimationClip _happyAnimation = null;
-        /*
-        [Tooltip("Bigger than the happy animation. May not be necessary")]
-        [SerializeField] protected AnimationClip _overjoyedAnimation = null;
-        */
         [SerializeField] protected AnimationClip _sadAnimation = null;
         [SerializeField] protected AnimationClip _angryAnimation = null;
 
@@ -26,7 +27,13 @@ namespace NPC {
         [Header("Preset Locations")]
         [SerializeField] protected Transform _levelPosition = null;
 
-        
+        [Header("Sounds")]
+        [SerializeField] protected AudioClip _sound1 = null;
+
+        Rigidbody _rb;
+        Collider _collider;
+        AudioSource _audioSource;
+        Animator _animator;
 
 
         public abstract void Idle();
@@ -34,69 +41,64 @@ namespace NPC {
         public abstract void Reactions();
         public abstract void Dialogue();
 
-
-        #region Interaction
-        Rigidbody _rb;
-
         private void Awake()
         {
             _rb = GetComponent<Rigidbody>();
+            _collider = GetComponent<Collider>();
+            _audioSource = GetComponent<AudioSource>();
+            _animator = GetComponent<Animator>();
         }
 
-        void MoveHorizontal()
+        #region Animation
+
+        AnimatorControllerParameter[] _animParameters;
+        
+
+        void GetComponenets()
         {
-            Quaternion turnOffset = Quaternion.Euler(0, 30f, 0);
-            if (_rb != null)
-            {
-                _rb.MoveRotation(_rb.rotation * turnOffset);
-            }
+            _animParameters = _animator.parameters;
+            Debug.Log(_animParameters.Length);
+
+            Debug.Log(_animator.GetCurrentAnimatorStateInfo(0).IsName("ReactionTest"));
         }
 
-        void MoveVerticalBackwards()
+        void SetAnimations()
         {
-            Quaternion turnOffset = Quaternion.Euler(-30f, 0, -20f);
-            if (_rb != null)
-            {
-                _rb.MoveRotation(_rb.rotation * turnOffset);
-            }
+            //check if animator has states
+
+            if (_animator.HasState(0,))
+
         }
 
-        void MoveVerticalForwards()
-        {
-            Quaternion turnOffset = Quaternion.Euler(30f, 0, 20f);
-            if (_rb != null)
-            {
-                _rb.MoveRotation(_rb.rotation * turnOffset);
-            }
-        }
+        #endregion
+
+        #region Interaction
 
         //This is when the mouse first hovers over the object.
         public void OnHoverEnter()
         {
-            Debug.Log("Hovering over " + gameObject.name);
-            MoveHorizontal();
+            //Debug.Log("Hovering over " + gameObject.name);
         }
 
         //This is when the mouse leaves the shape of the object.
         public void OnHoverExit()
         {
-            Debug.Log("No Longer Hovering over" + gameObject.name);
+            //Debug.Log("No Longer Hovering over" + gameObject.name);
         }
 
         //This is when the mouse left clicks on the object.
         public void OnLeftClick()
         {
             Debug.Log("Left Clicked On" + gameObject.name);
-            MoveVerticalForwards();
+            _animator.SetTrigger("ReactionTrigger");
+            GetComponenets();
         }
 
         //This is when the mouse right clicks on an object.
         public void OnRightClick()
         {
             Debug.Log("Right Clicked On" + gameObject.name);
-            MoveVerticalBackwards();
         }
-
         #endregion
     }
 }
